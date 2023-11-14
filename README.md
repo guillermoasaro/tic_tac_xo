@@ -1,6 +1,6 @@
-# tic_tac_xo
+# [WIP] TicTacXO
 
-A new Flutter project.
+A new test project.
 
 ## Getting Started
 

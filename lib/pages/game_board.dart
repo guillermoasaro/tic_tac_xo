@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class GameBoard extends StatefulWidget {
@@ -11,12 +13,44 @@ class GameBoard extends StatefulWidget {
 }
 
 class _GameBoardState extends State<GameBoard> {
-  bool xPlayerTurn = true;
+  List<int> moves = [];
 
   @override
   void initState() {
     super.initState();
-    //xPlayerTurn = widget.isPlayerX;
+    resetMoves();
+  }
+
+  void resetMoves() {
+    moves = [];
+    if(!widget.isPlayerX && widget.autoPlay){
+      nextAutoMove();
+    }
+  }
+
+  String gameStatus(){
+    String? winner = whoWon();
+    if (winner != null){
+      return 'Player $winner won!';
+    }
+    return 'Player ${moves.length.isEven ? "X" : "O"} it\'s your turn!';
+  }
+
+  String? whoWon() {
+    return null;
+  }
+
+  void nextAutoMove() {
+    var tryMove;
+    print("PREV all moves $moves");
+    if(moves.length < 9) {
+      do {
+        tryMove = Random().nextInt(9);
+      } while(moves.contains(tryMove));
+      moves.add(tryMove);
+      print("PC MOVES $tryMove");
+      print("POST all moves $moves");
+    }
   }
 
   @override
@@ -37,26 +71,41 @@ class _GameBoardState extends State<GameBoard> {
                 ),
                 itemCount: 9,
                 itemBuilder: (context, index) {
-                  // TODO: Logic to display 'X' or 'O' images
-                  final imageAsset =
-                      index % 2 == 0 ? 'assets/cookie.png' : 'assets/donut.png';
+                  // Logic to display 'X' or 'O' images
+                  int moveIndex = moves.indexOf(index);
+                  final imageAsset = moveIndex % 2 == 0 ? 'assets/cookie.png' : 'assets/donut.png';
 
-                  return GestureDetector(
-                    onTap: () {
-                      print("cell tap");
-                    },
-                    child: Image.asset(imageAsset),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if(moveIndex < 0) {
+                          setState(() {
+                            moves.add(index);
+                          });
+
+                          if(widget.autoPlay) {
+                            nextAutoMove();
+                          }
+                        }
+                        print("cell tap $index");
+                      },
+                      child: moveIndex < 0 ? Container(color: Colors.grey,) : Image.asset(imageAsset),
+                    ),
                   );
                 },
               ),
             ),
             Text(
-              'Player ${xPlayerTurn ? "X" : "O"} it\'s your turn!',
+              gameStatus(),
               style: const TextStyle(fontSize: 18),
             ),
             ElevatedButton(
               onPressed: () {
-                // Reset the game (if needed)
+                print("Game was: $moves");
+                setState(() {
+                  resetMoves();
+                });
               },
               child: const Text('NEW GAME'),
             ),

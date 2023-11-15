@@ -1,10 +1,15 @@
 # [WIP] TicTacXO
 
-A new test project.
+A new test flutter project with the classic tic-tac-toe game.
+
+|         Home          |    Side Selection     |         Board         |
+|:---------------------:|:---------------------:|:---------------------:|
+| ![](screenshot_1.png) | ![](screenshot_2.png) | ![](screenshot_3.png) |
+
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
 

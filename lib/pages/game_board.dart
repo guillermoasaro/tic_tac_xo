@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class GameBoard extends StatefulWidget {
@@ -28,28 +27,82 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
-  String gameStatus(){
+  bool gameEnded(){
+    if(whoWon() != null || moves.length >= 9) {
+      showAlert();
+      return true;
+    }
+    return false;
+  }
+
+  String gameStatusText(){
     String? winner = whoWon();
     if (winner != null){
       return 'Player $winner won!';
+    } else if(moves.length >= 9) {
+     return "Draw :/";
     }
     return 'Player ${moves.length.isEven ? "X" : "O"} it\'s your turn!';
   }
 
   String? whoWon() {
-    return null;
+    // Win conditions
+    List<String?> checks = [
+      // Horizontals
+      containsAll([0, 1, 2], moves),
+      containsAll([3, 4, 5], moves),
+      containsAll([6, 7, 8], moves),
+      // Verticals
+      containsAll([0, 3, 6], moves),
+      containsAll([1, 4, 7], moves),
+      containsAll([2, 5, 8], moves),
+      // Diagonals
+      containsAll([0, 4, 8], moves),
+      containsAll([2, 4, 6], moves),
+    ];
+
+    return checks.nonNulls.firstOrNull;
+  }
+
+  // TODO: Refactor name and dry logic
+  String? containsAll(List<int> list1, List<int> list2) {
+    if (list1.every((element) {
+        return list2.contains(element) && list2.indexOf(element).isEven;
+      })
+    ){
+      return "X";
+    }
+
+    if (list1.every((element) {
+      return list2.contains(element) && list2.indexOf(element).isOdd;
+    })
+    ){
+      return "O";
+    }
+  }
+
+  void processTap(int moveIndex, int index) {
+    if(moveIndex < 0 && !gameEnded()) {
+      setState(() {
+        moves.add(index);
+      });
+
+      if(widget.autoPlay) {
+        nextAutoMove();
+      }
+    }
   }
 
   void nextAutoMove() {
-    var tryMove;
-    print("PREV all moves $moves");
-    if(moves.length < 9) {
+    int tryMove;
+    if(moves.length < 9 && !gameEnded()) {
       do {
         tryMove = Random().nextInt(9);
       } while(moves.contains(tryMove));
       moves.add(tryMove);
-      print("PC MOVES $tryMove");
-      print("POST all moves $moves");
+      if(gameEnded()) {
+        print("GAME ENDED");
+      }
     }
   }
 
@@ -79,16 +132,7 @@ class _GameBoardState extends State<GameBoard> {
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
-                        if(moveIndex < 0) {
-                          setState(() {
-                            moves.add(index);
-                          });
-
-                          if(widget.autoPlay) {
-                            nextAutoMove();
-                          }
-                        }
-                        print("cell tap $index");
+                        processTap(moveIndex, index);
                       },
                       child: moveIndex < 0 ? Container(color: Colors.grey,) : Image.asset(imageAsset),
                     ),
@@ -97,7 +141,7 @@ class _GameBoardState extends State<GameBoard> {
               ),
             ),
             Text(
-              gameStatus(),
+              gameStatusText(),
               style: const TextStyle(fontSize: 18),
             ),
             ElevatedButton(
@@ -113,5 +157,28 @@ class _GameBoardState extends State<GameBoard> {
         ),
       ),
     );
+  }
+
+  // TODO: refactor win condition checking
+  void showAlert() {
+    var winner = whoWon();
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Game over"),
+            content: Text(winner != null ? "Player $winner won" : "It is just a draw"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Back"),
+              )
+            ],
+          );
+        });
+    setState(() {});
   }
 }

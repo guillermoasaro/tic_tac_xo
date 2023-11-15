@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
 
-class GameBoard extends StatelessWidget {
-  const GameBoard({Key? key}) : super(key: key);
+class GameBoard extends StatefulWidget {
+  final bool autoPlay;
+  final bool isPlayerX;
+
+  const GameBoard({super.key, this.autoPlay = true, this.isPlayerX = true});
+
+  @override
+  State<GameBoard> createState() => _GameBoardState();
+}
+
+class _GameBoardState extends State<GameBoard> {
+  bool xPlayerTurn = true;
+
+  @override
+  void initState() {
+    super.initState();
+    //xPlayerTurn = widget.isPlayerX;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +50,15 @@ class GameBoard extends StatelessWidget {
                 },
               ),
             ),
-            const Text(
-              'Player X it\'s your turn!', // TODO: Replace with real player turn
-              style: TextStyle(fontSize: 18),
+            Text(
+              'Player ${xPlayerTurn ? "X" : "O"} it\'s your turn!',
+              style: const TextStyle(fontSize: 18),
             ),
             ElevatedButton(
               onPressed: () {
                 // Reset the game (if needed)
               },
-              child: const Text('New Game'),
+              child: const Text('NEW GAME'),
             ),
           ],
         ),

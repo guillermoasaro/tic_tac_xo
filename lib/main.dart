@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tic_tac_xo/pages/game_board.dart';
 import 'package:tic_tac_xo/pages/landing_page.dart';
 
 void main() {
@@ -14,7 +13,7 @@ class TicTacXOApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tic-Tac XO',
-      home: GameBoard()
+      home: LandingPage()
     );
   }
 }
